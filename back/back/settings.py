@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import ldap
+from django_auth_ldap.config import LDAPSearch
+
 
 load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -184,3 +187,19 @@ LOGGING = {
         }
     },
 }
+
+
+# LDAP settings
+AUTHENTICATION_BACKENDS = [
+    "api.backends.CustomLDAPBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+AUTH_LDAP_SERVER_URI = "ldap://localhost:1389"
+
+AUTH_LDAP_BIND_DN = "admin"
+AUTH_LDAP_BIND_PASSWORD = "adminpassword"
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    "ou=users,dc=example,dc=org", ldap.SCOPE_SUBTREE, "(cn=%(user)s)"
+)
+AUTH_LDAP_USER_DN_TEMPLATE = "cn=%(user)s,ou=users,dc=example,dc=org"
